@@ -12,8 +12,11 @@ public class DroneInputManager : MonoBehaviour
 
     public TextMeshProUGUI errorText;
     public TextMeshProUGUI dronesLeftText;
+    public Button dronesSendButton;
 
     private int maxDrones = 999;
+
+    public ServerConnector serverConnector;
 
     public void ValidateInputs()
     {
@@ -40,6 +43,44 @@ public class DroneInputManager : MonoBehaviour
 
         errorText.text = "";
         dronesLeftText.text = $"Дронів залишилось: {maxDrones - sum}";
+
+        if (maxDrones == 0)
+        {
+            dronesSendButton.interactable = true;
+        }
+    }
+
+    public void SendToServerIfValid()
+    {
+        int kronus = ParseInput(inputKronus.text);
+        int lyrion = ParseInput(inputLyrion.text);
+        int mystara = ParseInput(inputMystara.text);
+        int eclipsia = ParseInput(inputEclipsia.text);
+        int fiora = ParseInput(inputFiora.text);
+
+        // Перевірка спадання
+        if (!(kronus >= lyrion && lyrion >= mystara && mystara >= eclipsia && eclipsia >= fiora))
+        {
+            errorText.text = "Значення повинні спадати: Kronus ≥ Lyrion ≥ Mystara ≥ Eclipsia ≥ Fiora";
+            dronesLeftText.text = "";
+            return;
+        }
+
+        int sum = kronus + lyrion + mystara + eclipsia + fiora;
+        if (sum > maxDrones)
+        {
+            errorText.text = $"Ви ввели забагато дронів! Максимум {maxDrones}.";
+            dronesLeftText.text = "";
+            return;
+        }
+
+        // Якщо все коректно — надсилаємо на сервер
+        errorText.text = "";
+        dronesLeftText.text = $"Дронів залишилось: {maxDrones - sum}";
+
+        // Тут викликаємо метод серверного з'єднання — наприклад:
+        dronesSendButton.interactable = false;
+        serverConnector.SendDroneDistribution(kronus, lyrion, mystara, eclipsia, fiora);
     }
 
     public void ClearMessages()

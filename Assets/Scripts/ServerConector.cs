@@ -5,9 +5,9 @@ using UnityEngine.Networking;
 
 public class ServerConnector : MonoBehaviour
 {
-    private string register = "https://2527-93-170-117-28.ngrok-free.app/game_server/register.php";
-    private string lobby = "https://2527-93-170-117-28.ngrok-free.app/game_server/start_game.php";
-    private string move;
+    private string register = "https://f646-93-170-117-28.ngrok-free.app/game_server/register.php";
+    private string lobby = "https://f646-93-170-117-28.ngrok-free.app/game_server/start_game.php";
+    private string move = "https://f646-93-170-117-28.ngrok-free.app/game_server/submit_move.php";
 
     public void RegisterPlayer(string username, Action<bool> onComplete)
     {
@@ -135,6 +135,35 @@ public class ServerConnector : MonoBehaviour
         }
     }
 
+    public void SendDroneDistribution(int playerId, int kronus, int lyrion, int mystara, int eclipsia, int fiora)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("player_id", playerId);
+        form.AddField("kronus", kronus);
+        form.AddField("lyrion", lyrion);
+        form.AddField("mystara", mystara);
+        form.AddField("eclipsia", eclipsia);
+        form.AddField("fiora", fiora);
+
+        StartCoroutine(PostFormRequest(move, form));
+    }
+
+    private IEnumerator PostFormRequest(string url, WWWForm form)
+    {
+        UnityWebRequest request = UnityWebRequest.Post(url, form);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("Успішно надіслано: " + request.downloadHandler.text);
+        }
+        else
+        {
+            Debug.LogError("Помилка запиту: " + request.error);
+        }
+    }
+
     [Serializable]
     private class ErrorResponse
     {
@@ -156,5 +185,15 @@ public class ServerConnector : MonoBehaviour
         public int player_count;
         public int elapsed_time;
         public string error;
+    }
+
+    [System.Serializable]
+    public class DroneData
+    {
+        public int Kronus;
+        public int Lyrion;
+        public int Mystara;
+        public int Eclipsia;
+        public int Fiora;
     }
 }
