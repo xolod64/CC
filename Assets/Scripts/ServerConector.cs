@@ -181,20 +181,28 @@ public class ServerConnector : MonoBehaviour
 
     public void SendDroneDistribution(int playerId, int kronus, int lyrion, int mystara, int eclipsia, int fiora)
     {
-        WWWForm form = new WWWForm();
-        form.AddField("player_id", playerId);
-        form.AddField("kronus", kronus);
-        form.AddField("lyrion", lyrion);
-        form.AddField("mystara", mystara);
-        form.AddField("eclipsia", eclipsia);
-        form.AddField("fiora", fiora);
+        DroneDistributionData data = new DroneDistributionData
+        {
+            player_id = playerId,
+            kronus = kronus,
+            lyrion = lyrion,
+            mystara = mystara,
+            eclipsia = eclipsia,
+            fiora = fiora
+        };
 
-        StartCoroutine(PostFormRequest(move, form));
+        string json = JsonUtility.ToJson(data);
+        StartCoroutine(PostJsonRequest(move, json));
     }
 
-    private IEnumerator PostFormRequest(string url, WWWForm form)
+    private IEnumerator PostJsonRequest(string url, string json)
     {
-        UnityWebRequest request = UnityWebRequest.Post(url, form);
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
 
         yield return request.SendWebRequest();
 
@@ -235,5 +243,16 @@ public class ServerConnector : MonoBehaviour
         public int Mystara;
         public int Eclipsia;
         public int Fiora;
+    }
+
+    [System.Serializable]
+    public class DroneDistributionData
+    {
+        public int player_id;
+        public int kronus;
+        public int lyrion;
+        public int mystara;
+        public int eclipsia;
+        public int fiora;
     }
 }
