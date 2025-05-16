@@ -14,43 +14,46 @@ public class ServerConnector : MonoBehaviour
         StartCoroutine(RegisterCoroutine(username, onComplete));
     }
 
-    private IEnumerator RegisterCoroutine(string username, Action<bool> onComplete)
+ private int playerId; // Збереження ID гравця після реєстрації
+
+private IEnumerator RegisterCoroutine(string username, Action<bool> onComplete)
+{
+    string jsonData = JsonUtility.ToJson(new PlayerData { username = username });
+    byte[] postData = System.Text.Encoding.UTF8.GetBytes(jsonData);
+
+    UnityWebRequest request = new UnityWebRequest(register, "POST");
+    request.uploadHandler = new UploadHandlerRaw(postData);
+    request.downloadHandler = new DownloadHandlerBuffer();
+    request.SetRequestHeader("Content-Type", "application/json");
+
+    yield return request.SendWebRequest();
+
+    if (request.result == UnityWebRequest.Result.Success)
     {
-        string jsonData = JsonUtility.ToJson(new PlayerData { username = username });
-        byte[] postData = System.Text.Encoding.UTF8.GetBytes(jsonData);
+        string responseText = request.downloadHandler.text;
+        Debug.Log("Відповідь сервера: " + responseText);
 
-        UnityWebRequest request = new UnityWebRequest(register, "POST");
-        request.uploadHandler = new UploadHandlerRaw(postData);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
+        RegisterResponse response = JsonUtility.FromJson<RegisterResponse>(responseText);
 
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
+        if (!string.IsNullOrEmpty(response.error))
         {
-            string responseText = request.downloadHandler.text;
-            Debug.Log("Відповідь сервера: " + responseText);
-
-            // Парсимо відповідь у клас ErrorResponse
-            ErrorResponse errorResponse = JsonUtility.FromJson<ErrorResponse>(responseText);
-
-            // Якщо поле error не порожнє, вважаємо, що сталася серверна помилка
-            if (!string.IsNullOrEmpty(errorResponse.error))
-            {
-                Debug.LogError("Помилка від сервера: " + errorResponse.error);
-                onComplete?.Invoke(false);
-            }
-            else
-            {
-                onComplete?.Invoke(true);
-            }
+            Debug.LogError("Помилка від сервера: " + response.error);
+            onComplete?.Invoke(false);
         }
         else
         {
-            Debug.LogError("Помилка при підключенні до сервера: " + request.error);
-            onComplete?.Invoke(false);
+            playerId = response.player_id;
+            Debug.Log("Гравець зареєстрований з ID: " + playerId);
+            onComplete?.Invoke(true);
         }
     }
+    else
+    {
+        Debug.LogError("Помилка при підключенні до сервера: " + request.error);
+        onComplete?.Invoke(false);
+    }
+}
+
 
     public void CheckStatus()
     {
