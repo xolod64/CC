@@ -33,7 +33,6 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        serverConnector = gameObject.AddComponent<ServerConnector>();
         submitButton.onClick.AddListener(OnSubmitName);
         SetState(GameState.EnterName);
 

@@ -9,50 +9,64 @@ public class ServerConnector : MonoBehaviour
     private string lobby = "https://f646-93-170-117-28.ngrok-free.app/game_server/start_game.php";
     private string move = "https://f646-93-170-117-28.ngrok-free.app/game_server/submit_move.php";
 
+    public int ID;
+
     public void RegisterPlayer(string username, Action<bool> onComplete)
     {
         StartCoroutine(RegisterCoroutine(username, onComplete));
     }
 
- private int playerId; // Збереження ID гравця після реєстрації
-
-private IEnumerator RegisterCoroutine(string username, Action<bool> onComplete)
-{
-    string jsonData = JsonUtility.ToJson(new PlayerData { username = username });
-    byte[] postData = System.Text.Encoding.UTF8.GetBytes(jsonData);
-
-    UnityWebRequest request = new UnityWebRequest(register, "POST");
-    request.uploadHandler = new UploadHandlerRaw(postData);
-    request.downloadHandler = new DownloadHandlerBuffer();
-    request.SetRequestHeader("Content-Type", "application/json");
-
-    yield return request.SendWebRequest();
-
-    if (request.result == UnityWebRequest.Result.Success)
+    private IEnumerator RegisterCoroutine(string username, Action<bool> onComplete)
     {
-        string responseText = request.downloadHandler.text;
-        Debug.Log("Відповідь сервера: " + responseText);
+        string jsonData = JsonUtility.ToJson(new PlayerData { username = username });
+        byte[] postData = System.Text.Encoding.UTF8.GetBytes(jsonData);
 
-        RegisterResponse response = JsonUtility.FromJson<RegisterResponse>(responseText);
+        UnityWebRequest request = new UnityWebRequest(register, "POST");
+        request.uploadHandler = new UploadHandlerRaw(postData);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
 
-        if (!string.IsNullOrEmpty(response.error))
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.LogError("Помилка від сервера: " + response.error);
-            onComplete?.Invoke(false);
+            string responseText = request.downloadHandler.text;
+            Debug.Log("Відповідь сервера: " + responseText);
+
+            // Парсимо поле error
+            ErrorResponse errorResponse = JsonUtility.FromJson<ErrorResponse>(responseText);
+
+            if (!string.IsNullOrEmpty(errorResponse.error))
+            {
+                Debug.LogError("Помилка від сервера: " + errorResponse.error);
+                onComplete?.Invoke(false);
+            }
+            else
+            {
+                // 🔍 Знаходимо player_id за допомогою регулярного виразу
+                System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(responseText, "\"player_id\"\\s*:\\s*(\\d+)");
+                if (match.Success)
+                {
+                    int playerId = int.Parse(match.Groups[1].Value);
+                    PlayerPrefs.SetInt("player_id", playerId);
+                    PlayerPrefs.Save();
+
+                    ID = playerId;
+                    onComplete?.Invoke(true);
+                }
+                else
+                {
+                    Debug.LogError("player_id не знайдено у відповіді.");
+                    onComplete?.Invoke(false);
+                }
+            }
         }
         else
         {
-            playerId = response.player_id;
-            Debug.Log("Гравець зареєстрований з ID: " + playerId);
-            onComplete?.Invoke(true);
+            Debug.LogError("Помилка при підключенні до сервера: " + request.error);
+            onComplete?.Invoke(false);
         }
     }
-    else
-    {
-        Debug.LogError("Помилка при підключенні до сервера: " + request.error);
-        onComplete?.Invoke(false);
-    }
-}
 
 
     public void CheckStatus()
