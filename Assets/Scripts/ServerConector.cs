@@ -123,7 +123,9 @@ public class ServerConnector : MonoBehaviour
     {
         while (true)
         {
-            using (UnityWebRequest www = UnityWebRequest.Get(lobby))
+            string urlWithTimestamp = lobby + "?t=" + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            using (UnityWebRequest www = UnityWebRequest.Get(urlWithTimestamp))
             {
                 yield return www.SendWebRequest();
 
@@ -134,16 +136,41 @@ public class ServerConnector : MonoBehaviour
                 else
                 {
                     string json = www.downloadHandler.text;
-                    GameStatusResponse response = JsonUtility.FromJson<GameStatusResponse>(json);
+                    Debug.Log("CheckGameStatusLoop JSON: " + json);
+
+                    GameStatusResponse response = null;
+                    bool parseSuccess = false;
+
+                    try
+                    {
+                        response = JsonUtility.FromJson<GameStatusResponse>(json);
+                        parseSuccess = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError("Помилка парсингу JSON: " + ex.Message);
+                    }
+
+                    if (!parseSuccess)
+                    {
+                        yield return new WaitForSeconds(1f);
+                        continue;
+                    }
 
                     if (response.status == "waiting")
                     {
-                        onTimeLeftUpdate?.Invoke(response.time_left);
+                        if (response.time_left.HasValue)
+                            onTimeLeftUpdate?.Invoke(response.time_left.Value);
                     }
                     else if (response.status == "started")
                     {
+                        Debug.Log("Гра почалася!");
                         onGameStarted?.Invoke();
                         yield break;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Невідомий статус гри: " + response.status);
                     }
                 }
             }
@@ -194,14 +221,10 @@ public class ServerConnector : MonoBehaviour
     }
 
     [Serializable]
-    private class GameStatusResponse
+    public class GameStatusResponse
     {
         public string status;
-        public int time_left;
-        public string message;
-        public int player_count;
-        public int elapsed_time;
-        public string error;
+        public int? time_left; // nullable, бо іноді його немає
     }
 
     [System.Serializable]
