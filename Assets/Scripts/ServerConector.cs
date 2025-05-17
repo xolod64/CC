@@ -5,9 +5,9 @@ using UnityEngine.Networking;
 
 public class ServerConnector : MonoBehaviour
 {
-    private string register = "https://f646-93-170-117-28.ngrok-free.app/game_server/register.php";
-    private string lobby = "https://f646-93-170-117-28.ngrok-free.app/game_server/start_game.php";
-    private string move = "https://f646-93-170-117-28.ngrok-free.app/game_server/submit_move.php";
+    private string register = "https://1f2c-93-170-117-28.ngrok-free.app/game_server/register.php";
+    private string lobby = "https://1f2c-93-170-117-28.ngrok-free.app/game_server/start_game.php";
+    private string move = "https://1f2c-93-170-117-28.ngrok-free.app/game_server/submit_move.php";
 
     public int ID;
 
@@ -192,6 +192,7 @@ public class ServerConnector : MonoBehaviour
         };
 
         string json = JsonUtility.ToJson(data);
+        Debug.Log("JSON що надсилається: " + json);
         StartCoroutine(PostJsonRequest(move, json));
     }
 
