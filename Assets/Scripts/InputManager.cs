@@ -53,11 +53,23 @@ public class DroneInputManager : MonoBehaviour
 
     public void SendToServerIfValid()
     {
-        int kronus = ParseInput(inputKronus.text);
-        int lyrion = ParseInput(inputLyrion.text);
-        int mystara = ParseInput(inputMystara.text);
-        int eclipsia = ParseInput(inputEclipsia.text);
-        int fiora = ParseInput(inputFiora.text);
+        int kronus = ParseInputSafe(inputKronus?.text);
+        int lyrion = ParseInputSafe(inputLyrion?.text);
+        int mystara = ParseInputSafe(inputMystara?.text);
+        int eclipsia = ParseInputSafe(inputEclipsia?.text);
+        int fiora = ParseInputSafe(inputFiora?.text);
+
+        // Метод для безпечного парсингу
+        int ParseInputSafe(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return 0;
+
+            if (int.TryParse(input, out int value))
+                return value;
+
+            return 0; // якщо в тексті не число
+        }
 
         // Перевірка спадання
         if (!(kronus >= lyrion && lyrion >= mystara && mystara >= eclipsia && eclipsia >= fiora))
