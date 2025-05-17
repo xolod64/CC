@@ -3760,7 +3760,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ID: 0
-  gameManager: {fileID: 1599849427}
 --- !u!1 &1681357081
 GameObject:
   m_ObjectHideFlags: 0

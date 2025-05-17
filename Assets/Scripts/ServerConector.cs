@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -9,11 +8,8 @@ public class ServerConnector : MonoBehaviour
     private string register = "https://1f2c-93-170-117-28.ngrok-free.app/game_server/register.php";
     private string lobby = "https://1f2c-93-170-117-28.ngrok-free.app/game_server/start_game.php";
     private string move = "https://1f2c-93-170-117-28.ngrok-free.app/game_server/submit_move.php";
-    private string results = "https://1f2c-93-170-117-28.ngrok-free.app/game_server/get_results.php";
 
     public int ID;
-    public Dictionary<string, int> playerScores = new Dictionary<string, int>();
-    public GameManager gameManager;
 
     public void RegisterPlayer(string username, Action<bool> onComplete)
     {
@@ -221,60 +217,6 @@ public class ServerConnector : MonoBehaviour
         }
     }
 
-    public void GetResults()
-    {
-        StartCoroutine(CheckUntilSuccess());
-    }
-
-    IEnumerator CheckUntilSuccess()
-    {
-        bool success = false;
-
-        while (!success)
-        {
-            UnityWebRequest request = UnityWebRequest.Get(results);
-            yield return request.SendWebRequest();
-
-            if (request.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Помилка запиту: " + request.error);
-                yield return new WaitForSeconds(1f);
-                continue;
-            }
-
-            string json = request.downloadHandler.text;
-
-            // Спроба розпарсити, навіть якщо success == false
-            RoundResponseWrapper wrapper = JsonUtility.FromJson<RoundResponseWrapper>("{\"wrapper\":" + json + "}");
-            RoundResponse response = wrapper.wrapper;
-
-            success = response.success;
-
-            if (!success)
-            {
-                Debug.Log("Очікуємо завершення раунду... Спроба ще через 1 секунду");
-                yield return new WaitForSeconds(1f);
-                continue;
-            }
-
-            // Якщо success == true: обробити результати
-            Debug.Log("Раунд завершено. Отримуємо результати...");
-
-            playerScores.Clear();
-            foreach (ResultEntry entry in response.results)
-            {
-                playerScores[entry.username] = entry.total_score;
-            }
-
-            foreach (var kvp in playerScores)
-            {
-                Debug.Log($"Гравець {kvp.Key} має рахунок {kvp.Value}");
-            }
-
-            gameManager.SetState(GameState.RoundInProgress);
-        }
-    }
-
     [Serializable]
     private class ErrorResponse
     {
@@ -313,37 +255,5 @@ public class ServerConnector : MonoBehaviour
         public int mystara;
         public int eclipsia;
         public int fiora;
-    }
-
-    [Serializable]
-    public class RoundResponseWrapper
-    {
-        public RoundResponse wrapper;
-    }
-
-    [Serializable]
-    public class RoundResponse
-    {
-        public bool success;
-        public bool round_completed;
-        public int round;
-        public ResultEntry[] results;
-        public bool is_new_round;
-        public int? new_round;
-        public long timestamp;
-    }
-
-    [Serializable]
-    public class ResultEntry
-    {
-        public int player_id;
-        public string username;
-        public int kronus;
-        public int lyrion;
-        public int mystara;
-        public int eclipsia;
-        public int fiora;
-        public int round_score;
-        public int total_score;
     }
 }

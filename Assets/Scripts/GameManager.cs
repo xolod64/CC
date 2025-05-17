@@ -73,8 +73,7 @@ public class GameManager : MonoBehaviour
                 break;
 
             case GameState.ShowResults:
-                messageText.text = $"Waiting for other players";
-                serverConnector.GetResults();
+                messageText.text = $"Round Results";
                 Light.enabled = true;
                 break;
         }
