@@ -101,6 +101,11 @@ public class DroneInputManager : MonoBehaviour
     {
         errorText.text = "";
         dronesLeftText.text = "";
+        inputKronus.textComponent.enabled = false;
+        inputLyrion.textComponent.enabled = false;
+        inputMystara.textComponent.enabled = false;
+        inputEclipsia.textComponent.enabled = false;
+        inputFiora.textComponent.enabled = false;
     }
 
     private int ParseInput(string text)

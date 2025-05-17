@@ -273,7 +273,14 @@ public class ServerConnector : MonoBehaviour
             }
 
             scoreDisplay.UpdateScoreText(playerScores);
-            gameManager.SetState(GameState.RoundInProgress);
+            if (response.round > 5)
+            {
+                gameManager.SetState(GameState.GameOver);
+            }
+            else
+            {
+                gameManager.SetState(GameState.RoundInProgress);
+            }
         }
     }
 

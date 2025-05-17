@@ -10,7 +10,8 @@ public enum GameState
     EnterName,
     WaitingForOthers,
     RoundInProgress,
-    ShowResults
+    ShowResults,
+    GameOver
 }
 
 public class GameManager : MonoBehaviour
@@ -77,6 +78,11 @@ public class GameManager : MonoBehaviour
                 serverConnector.GetResults();
                 Light.enabled = true;
                 break;
+
+            case GameState.GameOver:
+                messageText.text = $"Game over";
+                Light.enabled = true;
+                break;
         }
 
         SetGameState(currentState);
@@ -120,7 +126,14 @@ public class GameManager : MonoBehaviour
         if (!interactable)
             validator.ClearMessages();
         else
+        {
+            validator.inputKronus.textComponent.enabled = true;
+            validator.inputLyrion.textComponent.enabled = true;
+            validator.inputMystara.textComponent.enabled = true;
+            validator.inputEclipsia.textComponent.enabled = true;
+            validator.inputFiora.textComponent.enabled = true;
             validator.ValidateInputs();
+        }
     }
 
     private void SetTimeLeft(int seconds)
