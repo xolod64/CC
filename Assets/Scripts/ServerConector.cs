@@ -14,6 +14,7 @@ public class ServerConnector : MonoBehaviour
     public int ID;
     public Dictionary<string, int> playerScores = new Dictionary<string, int>();
     public GameManager gameManager;
+    public ScoreDisplay scoreDisplay;
 
     public void RegisterPlayer(string username, Action<bool> onComplete)
     {
@@ -271,6 +272,7 @@ public class ServerConnector : MonoBehaviour
                 Debug.Log($"Гравець {kvp.Key} має рахунок {kvp.Value}");
             }
 
+            scoreDisplay.UpdateScoreText(playerScores);
             gameManager.SetState(GameState.RoundInProgress);
         }
     }
