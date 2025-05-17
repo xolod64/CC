@@ -46,11 +46,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-    }
-
-    private void SetState(GameState newState)
+    public void SetState(GameState newState)
     {
         currentState = newState;
 

@@ -17,6 +17,7 @@ public class DroneInputManager : MonoBehaviour
     private int maxDrones = 999;
 
     public ServerConnector serverConnector;
+    public GameManager gameManager;
 
     public void ValidateInputs()
     {
@@ -44,7 +45,7 @@ public class DroneInputManager : MonoBehaviour
         errorText.text = "";
         dronesLeftText.text = $"Дронів залишилось: {maxDrones - sum}";
 
-        if (maxDrones - sum == 0)
+        if (maxDrones - sum == 0 && (kronus >= lyrion && lyrion >= mystara && mystara >= eclipsia && eclipsia >= fiora))
         {
             dronesSendButton.gameObject.SetActive(true);
         }
@@ -81,6 +82,7 @@ public class DroneInputManager : MonoBehaviour
         // Тут викликаємо метод серверного з'єднання — наприклад:
         dronesSendButton.gameObject.SetActive(false);
         serverConnector.SendDroneDistribution(serverConnector.ID, kronus, lyrion, mystara, eclipsia, fiora);
+        gameManager.SetState(GameState.ShowResults);
     }
 
     public void ClearMessages()
