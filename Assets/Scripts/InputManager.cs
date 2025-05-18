@@ -45,6 +45,15 @@ public class DroneInputManager : MonoBehaviour
         errorText.text = "";
         dronesLeftText.text = $"Дронів залишилось: {maxDrones - sum}";
 
+        int k = ParseInputSafe(inputKronus?.text);
+        int l = ParseInputSafe(inputLyrion?.text);
+        int m = ParseInputSafe(inputMystara?.text);
+        int e = ParseInputSafe(inputEclipsia?.text);
+        int f = ParseInputSafe(inputFiora?.text);
+
+        int[] dronesCount = new int[5] { k, l, m, e, f };
+        gameManager.SetDroneActivityLevels(dronesCount);
+
         if (maxDrones - sum == 0 && (kronus >= lyrion && lyrion >= mystara && mystara >= eclipsia && eclipsia >= fiora))
         {
             dronesSendButton.gameObject.SetActive(true);
@@ -58,18 +67,6 @@ public class DroneInputManager : MonoBehaviour
         int mystara = ParseInputSafe(inputMystara?.text);
         int eclipsia = ParseInputSafe(inputEclipsia?.text);
         int fiora = ParseInputSafe(inputFiora?.text);
-
-        // Метод для безпечного парсингу
-        int ParseInputSafe(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return 0;
-
-            if (int.TryParse(input, out int value))
-                return value;
-
-            return 0; // якщо в тексті не число
-        }
 
         // Перевірка спадання
         if (!(kronus >= lyrion && lyrion >= mystara && mystara >= eclipsia && eclipsia >= fiora))
@@ -113,5 +110,17 @@ public class DroneInputManager : MonoBehaviour
         if (int.TryParse(text, out int val))
             return val;
         return 0;
+    }
+
+    // Метод для безпечного парсингу
+    int ParseInputSafe(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return 0;
+
+        if (int.TryParse(input, out int value))
+            return value;
+
+        return 0; // якщо в тексті не число
     }
 }

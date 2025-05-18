@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
 
     [Header("GameObjects References")]
     public Light2D Light;
+    public DroneOrbitController[] droneControllers;
 
     private string playerName;
 
@@ -39,7 +40,7 @@ public class GameManager : MonoBehaviour
 
         foreach (var input in droneInputs)
         {
-            input.onValueChanged.AddListener(_ => 
+            input.onValueChanged.AddListener(_ =>
             {
                 if (currentState == GameState.RoundInProgress)
                     validator.ValidateInputs();
@@ -70,6 +71,7 @@ public class GameManager : MonoBehaviour
 
             case GameState.RoundInProgress:
                 messageText.text = $"Distribute drones across the planets";
+                DeactivateAllDronesInAllControllers();
                 Light.enabled = true;
                 break;
 
@@ -82,6 +84,7 @@ public class GameManager : MonoBehaviour
             case GameState.GameOver:
                 messageText.text = $"Game over";
                 Light.enabled = true;
+                DeactivateAllDronesInAllControllers();
                 break;
         }
 
@@ -145,5 +148,34 @@ public class GameManager : MonoBehaviour
     private void OnGameStarted()
     {
         SetState(GameState.RoundInProgress);
+    }
+
+    public void DeactivateAllDronesInAllControllers()
+    {
+        foreach (var controller in droneControllers)
+        {
+            controller.DeactivateAllDrones();
+        }
+    }
+    
+    public void SetDroneActivityLevels(int[] values)
+    {
+        if (values.Length != 5 || droneControllers.Length < 5)
+        {
+            Debug.LogWarning("Очікується масив з 5 значень і щонайменше 5 контролерів.");
+            return;
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            int rawValue = values[i];
+            int mappedValue = Mathf.Clamp(rawValue / 100 + 1, 0, 10); // 0–99 => 1, ..., 900–999 => 10
+
+            // Спеціальний випадок: якщо rawValue == 0, mappedValue має бути 0
+            if (rawValue == 0)
+                mappedValue = 0;
+
+            droneControllers[i].ActivateDrones(mappedValue);
+        }
     }
 }
