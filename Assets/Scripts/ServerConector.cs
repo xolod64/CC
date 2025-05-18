@@ -156,6 +156,11 @@ public class ServerConnector : MonoBehaviour
                         Debug.LogError("Помилка парсингу JSON: " + ex.Message);
                     }
 
+                    if (!string.IsNullOrEmpty(response.message))
+                    {
+                        gameManager.messageText.text = response.message;
+                    }
+
                     if (!parseSuccess)
                     {
                         yield return new WaitForSeconds(1f);
@@ -305,6 +310,7 @@ public class ServerConnector : MonoBehaviour
     {
         public string status;
         public int? time_left; // nullable, бо іноді його немає
+        public string message;
     }
 
     [System.Serializable]
