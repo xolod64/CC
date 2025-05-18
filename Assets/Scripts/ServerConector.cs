@@ -246,6 +246,7 @@ public class ServerConnector : MonoBehaviour
             string json = request.downloadHandler.text;
 
             // Спроба розпарсити, навіть якщо success == false
+            Debug.Log("Отриманий JSON: " + json);
             RoundResponseWrapper wrapper = JsonUtility.FromJson<RoundResponseWrapper>("{\"wrapper\":" + json + "}");
             RoundResponse response = wrapper.wrapper;
 
