@@ -6,10 +6,10 @@ using UnityEngine.Networking;
 
 public class ServerConnector : MonoBehaviour
 {
-    private string register = "https://1f2c-93-170-117-28.ngrok-free.app/game_server/register.php";
-    private string lobby = "https://1f2c-93-170-117-28.ngrok-free.app/game_server/start_game.php";
-    private string move = "https://1f2c-93-170-117-28.ngrok-free.app/game_server/submit_move.php";
-    private string results = "https://1f2c-93-170-117-28.ngrok-free.app/game_server/get_results.php";
+    private string register = "https://9869-93-170-117-28.ngrok-free.app/game_server/register.php";
+    private string lobby = "https://9869-93-170-117-28.ngrok-free.app/game_server/start_game.php";
+    private string move = "https://9869-93-170-117-28.ngrok-free.app/game_server/submit_move.php";
+    private string results = "https://9869-93-170-117-28.ngrok-free.app/game_server/get_results.php";
 
     public int ID;
     public Dictionary<string, int> playerScores = new Dictionary<string, int>();
@@ -273,9 +273,12 @@ public class ServerConnector : MonoBehaviour
             }
 
             scoreDisplay.UpdateScoreText(playerScores);
-            if (response.round > 5)
+            if (response.round > 4)
             {
                 gameManager.SetState(GameState.GameOver);
+                Vector3 pos = scoreDisplay.transform.position;
+                pos.x = 0f;
+                scoreDisplay.transform.position = pos;
             }
             else
             {
