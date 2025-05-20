@@ -81,7 +81,7 @@ public class DroneOrbitController : MonoBehaviour
             if (drone.t > 1f)
             {
                 drone.t = 1f;
-                drone.direction = -1;
+                drone.direction = -1; // 556345
             }
             else if (drone.t < 0f)
             {
