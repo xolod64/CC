@@ -33,7 +33,7 @@ public class ServerConnector : MonoBehaviour
 
         yield return request.SendWebRequest();
 
-        if (request.result == UnityWebRequest.Result.Success)
+        if (request.result == UnityWebRequest.Result.Success) // 123
         {
             string responseText = request.downloadHandler.text;
             Debug.Log("Відповідь сервера: " + responseText);
