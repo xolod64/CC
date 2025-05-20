@@ -29,7 +29,7 @@ public class DroneInputManager : MonoBehaviour
 
         if (!(kronus >= lyrion && lyrion >= mystara && mystara >= eclipsia && eclipsia >= fiora))
         {
-            errorText.text = "Значення повинні спадати: Kronus ≥ Lyrion ≥ Mystara ≥ Eclipsia ≥ Fiora";
+            errorText.text = "The values ​​should decrease: Kronus ≥ Lyrion ≥ Mystara ≥ Eclipsia ≥ Fiora";
             dronesLeftText.text = "";
             return;
         }
@@ -37,7 +37,7 @@ public class DroneInputManager : MonoBehaviour
         int sum = kronus + lyrion + mystara + eclipsia + fiora;
         if (sum > maxDrones)
         {
-            errorText.text = $"Ви ввели забагато дронів! Максимум {maxDrones}.";
+            errorText.text = $"You have entered too many drones! Maximum {maxDrones}.";
             dronesLeftText.text = "";
             return;
         }
@@ -71,7 +71,7 @@ public class DroneInputManager : MonoBehaviour
         // Перевірка спадання
         if (!(kronus >= lyrion && lyrion >= mystara && mystara >= eclipsia && eclipsia >= fiora))
         {
-            errorText.text = "Значення повинні спадати: Kronus ≥ Lyrion ≥ Mystara ≥ Eclipsia ≥ Fiora";
+            errorText.text = "The values ​​should decrease: Kronus ≥ Lyrion ≥ Mystara ≥ Eclipsia ≥ Fiora";
             dronesLeftText.text = "";
             return;
         }
@@ -79,14 +79,14 @@ public class DroneInputManager : MonoBehaviour
         int sum = kronus + lyrion + mystara + eclipsia + fiora;
         if (sum > maxDrones)
         {
-            errorText.text = $"Ви ввели забагато дронів! Максимум {maxDrones}.";
+            errorText.text = $"You have entered too many drones! Maximum {maxDrones}.";
             dronesLeftText.text = "";
             return;
         }
 
         // Якщо все коректно — надсилаємо на сервер
         errorText.text = "";
-        dronesLeftText.text = $"Дронів залишилось: {maxDrones - sum}";
+        dronesLeftText.text = $"Drones left: {maxDrones - sum}";
 
         // Тут викликаємо метод серверного з'єднання — наприклад:
         dronesSendButton.gameObject.SetActive(false);
